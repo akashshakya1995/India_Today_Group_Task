@@ -1,7 +1,7 @@
 const bcrypt = require("bcryptjs");
+const { validate } = require("email-validator");
 const fs = require('fs');
 const path = require('path')
-const { bcryptfun } = require("../../../helper/comFunction");
 const { userModel } = require("../model/userModel");
 
 /********************************************************************************************************
@@ -11,6 +11,9 @@ const { userModel } = require("../model/userModel");
 // For check user exist or not on signUp time..
 const checkUserExist = async function (email, res) {
   return new Promise(async (resolve, reject) => {
+    if (!validate(email)) {
+      return sendRes(res, "Please provide valid email.", false, 406);
+    }
     const result = await userModel.findOne({ email });
     if (result) {
       return sendRes(res, "User already exist here from this email.", false, 302);
@@ -62,16 +65,24 @@ const uploadProfileImage = async function (res, files) {
 // For update profile image of user..
 const updateProfileImage = async function (req, res, files) {
   return new Promise(async (resolve, reject) => {
-    const newPath = path.join('uploadFile');
-    fs.unlink(newPath + "/" + req.userDetails.profileImage, async function (err, data) { // Delete profile image of user first
-      if (err) {
-        return sendRes(res, err, false, 501);
+    const newPath = path.join('uploadFile'); // Create local dir..
+    if (!fs.existsSync(newPath)) {
+      fs.mkdirSync(newPath);
+    }
+    fs.stat(newPath + "/" + req.userDetails.profileImage, async function (err, stat) { // Check file exist or not
+      if (err && err.code == 'ENOENT') {
+        resolve(await uploadProfileImage(res, files)) // Now create new profile image of user 
       } else {
-        resolve(await uploadProfileImage(res, files)) // Now update new profile image of user
+        fs.unlink(newPath + "/" + req.userDetails.profileImage, async function (err, data) { // Delete profile image of user first
+          if (err) {
+            return sendRes(res, err, false, 501);
+          } else {
+            resolve(await uploadProfileImage(res, files)) // Now update new profile image of user
+          }
+        });
       }
-    });
+    })
   })
-
 }
 
 module.exports = {

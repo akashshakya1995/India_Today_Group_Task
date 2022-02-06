@@ -18,7 +18,7 @@ const signUp = async function (req, res) { // For signup user.(Signup details sh
       }
       await checkUserExist(email, res); // Check user exist or not
       const obj = { firstName, lastName, email };
-      obj["password"] = await bcryptfun(password) // Password encryption
+      obj["password"] = await bcryptfun(password, res) // Password encryption
       if (files.profileImage) {
         obj["profileImage"] = await uploadProfileImage(res, files) // Upload profile image
       }
@@ -60,12 +60,14 @@ const updateUserDetails = async function (req, res) {
     const form = new formidable.IncomingForm()
     form.parse(req, async (err, fields, files) => {
       const { firstName, lastName, email, password } = fields;
+      const updateQuery = { firstName, lastName };
       if (email) {
         await checkUserExist(email, res) // Check user exist or not
+        updateQuery["email"] = email
       }
-      const updateQuery = { firstName, lastName, email };
       if (password) {
-        updateQuery["password"] = await bcryptfun(password) // Password encryption
+        updateQuery["password"] = await bcryptfun(password, res) // Password encryption
+        updateQuery["isLogin"] = false
       }
       if (files.profileImage) {
         updateQuery["profileImage"] = await updateProfileImage(req, res, files) // Update profile image 

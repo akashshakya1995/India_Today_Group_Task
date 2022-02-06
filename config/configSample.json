@@ -1,0 +1,8 @@
+{
+  "dbConnectionString":"mongodb://localhost:27017/SIMFORM",
+  "jwtSecretKey": "test@myCareer.com"
+}
+
+
+
+

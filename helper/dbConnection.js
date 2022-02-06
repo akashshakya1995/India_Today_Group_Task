@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 const { dbConnectionString } = require("../config/config.json");
 
-console.log('db +++++++++++++++', dbConnectionString)
 const dbConnect = async function () {
   try {
     console.log("Establishing Mongo DB Connection...");

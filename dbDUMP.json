@@ -1,0 +1,27 @@
+/* 1 */
+{
+    "_id" : ObjectId("61fff58847a3fd23445a111e"),
+    "firstName" : "nitesh",
+    "lastName" : "kumar",
+    "email" : "nitesh@gmail.com",
+    "password" : "$2a$10$QIVHMwmPCY7eSfCDyTwJ3.wXFQJ.iK7hHKah39HwKTc397BL2Tznu",
+    "profileImage" : "5403photo-1533450718592-29d45635f0a9.jpg",
+    "isLogin" : true,
+    "createdAt" : 1644164488351.0,
+    "updatedAt" : 1644164568993.0,
+    "__v" : 0
+}
+
+/* 2 */
+{
+    "_id" : ObjectId("61fff60e47a3fd23445a1128"),
+    "firstName" : "akash",
+    "lastName" : "kumar",
+    "email" : "akashkumar@gmail.com",
+    "password" : "$2a$10$/IiYy3SN051arvfLeOEwzegkMl8XQQkujmKKLQ9NgS7KzK.KFkula",
+    "profileImage" : "4300photo-1604605152447-1fcea1a333f3.jpg",
+    "isLogin" : false,
+    "createdAt" : 1644164622587.0,
+    "updatedAt" : 1644164948305.0,
+    "__v" : 0
+}
