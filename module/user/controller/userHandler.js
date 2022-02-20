@@ -1,35 +1,30 @@
-const formidable = require('formidable');
 const { userModel } = require("../model/userModel");
 const { jwtToken } = require("../../../helper/comFunction");
 const { bcryptfun } = require("../../../helper/comFunction")
-const { checkUserExist, checkUserVerified, uploadProfileImage, updateProfileImage } = require("../service/userService");
+const { checkUserVerified, updateProfileImage } = require("../service/userService");
 
 /************************************************************************************************************
- *                                   User API [ SignIn-UpdateUserDetails ]
+ *                                  User API [ CreateUserProfile-GetUser ]
  ************************************************************************************************************/
-const signUp = async function (req, res) { // For signup user.(Signup details should be in form data)
+
+const createUser = async function (req, res) { // For create user profile.(User details should be in form data)
   try {
-    const form = new formidable.IncomingForm()
-    form.parse(req, async (err, fields, files) => {
-      const { firstName, lastName, email, password } = fields;
-      if (err) { return sendRes(res, "Error in file!", false, 501) }
-      if (!email || !password) {
-        return sendRes(res, "Please provide required signup details as a email and password", false, 400);
-      }
-      await checkUserExist(email, res); // Check user exist or not
-      const obj = { firstName, lastName, email };
-      obj["password"] = await bcryptfun(password, res) // Password encryption
-      if (files.profileImage) {
-        obj["profileImage"] = await uploadProfileImage(res, files) // Upload profile image
-      }
-      const userSignup = await userModel.create(obj) // New user created 
-      return sendRes(res, "Successfully signUp.", true, 201, userSignup);
-    })
+    const updateObj = {
+      userName: req.formData.userName, email: req.formData.email, phoneNumber: "+" + req.formData.phoneNumber, gender: req.formData.gender,
+      langauge: req.formData.langauge, maritalStatus: req.formData.maritalStatus, dateOfBirth: req.formData.dateOfBirth, timeOfBirth: req.formData.timeOfBirth
+    }
+    updateObj["password"] = await bcryptfun(req.formData.password, res) // Password encryption
+    if (req.formData && req.formData.profileImage) {
+      updateObj["profileImage"] = await updateProfileImage(req, res) // Upload profile image
+    }
+    const userSignup = await userModel.updateOne({ email: req.formData.email }, { $set: updateObj }, { upsert: true }); // New or user updated 
+    return sendRes(res, "Successfully created user profile.", true, 201, userSignup);
   } catch (error) {
     return sendRes(res, error.message, false, 406);
   }
 };
 
+// For login user
 const signIn = async function (req, res) {
   try {
     const { email, password } = req.body;
@@ -45,6 +40,7 @@ const signIn = async function (req, res) {
   }
 };
 
+// For get user details with JWT.
 const getUser = async function (req, res) {
   try {
     const result = await userModel.findOne({ email: req.userDetails.email })  // To get authorized user data 
@@ -54,34 +50,9 @@ const getUser = async function (req, res) {
   }
 }
 
-// For update user details.(Update details should be in form data)
-const updateUserDetails = async function (req, res) {
-  try {
-    const form = new formidable.IncomingForm()
-    form.parse(req, async (err, fields, files) => {
-      const { firstName, lastName, email, password } = fields;
-      const updateQuery = { firstName, lastName };
-      if (email) {
-        await checkUserExist(email, res) // Check user exist or not
-        updateQuery["email"] = email
-      }
-      if (password) {
-        updateQuery["password"] = await bcryptfun(password, res) // Password encryption
-        updateQuery["isLogin"] = false
-      }
-      if (files.profileImage) {
-        updateQuery["profileImage"] = await updateProfileImage(req, res, files) // Update profile image 
-      }
-      await userModel.updateOne({ email: req.userDetails.email }, { $set: updateQuery }, { upsert: true }); // Update user details 
-      return sendRes(res, "Successfully updated user data.", true, 200);
-    })
-  } catch (error) {
-    return sendRes(res, error.message, false, 304);
-  }
-};
+
 module.exports = {
-  signUp,
+  createUser,
   signIn,
   getUser,
-  updateUserDetails
 };

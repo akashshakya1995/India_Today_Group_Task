@@ -1,7 +1,8 @@
 {
-  "dbConnectionString":"mongodb://localhost:27017/SIMFORM",
+  "dbConnectionString":"mongodb://localhost:27017/INDIA_TODAY",
   "jwtSecretKey": "test@myCareer.com"
 }
+
 
 
 
