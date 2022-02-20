@@ -19,6 +19,7 @@ app.use((req, res, next) => {
   next();
 });
 
+
 app.use(basePath, baseRouter);
 app.use("/getimage",express.static(__dirname + '/uploadFile'));
 
